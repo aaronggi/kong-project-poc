@@ -16,7 +16,7 @@ ADD ./proto /usr/local/kong/
 
 COPY ./external/googleapis/google /usr/local/kong/google
 
-COPY ./external/kong-plugin-grpc-gateway/kong /usr/local/custom/
+COPY ./external/kong-plugin-grpc-gateway/kong /usr/local/custom/kong
 
 #CMD [ "cd", "/home/kong/proto"]
 #CMD [ "go", "get", "google.golang.org/genproto/googleapis/api/annotations"]

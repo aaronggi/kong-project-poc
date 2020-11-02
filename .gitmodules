@@ -1,0 +1,9 @@
+[submodule "external/kong-plugin-grpc-gateway"]
+	path = external/kong-plugin-grpc-gateway
+	url = https://github.com/Kong/kong-plugin-grpc-gateway.git
+[submodule "external/googleapis"]
+	path = external/googleapis
+	url = https://github.com/googleapis/googleapis
+[submodule "external/kong-poc"]
+	path = external/kong-poc
+	url = https://github.com/billzhang3046/kong-poc.git

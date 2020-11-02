@@ -1,0 +1,51 @@
+﻿syntax = "proto3";
+
+//import "google/api/annotations.proto";
+
+option csharp_namespace = "GrpcEchoService";
+
+package loss;
+
+// The greeting service definition.
+service Loss {
+  // Sends a greeting
+  rpc GetEventResult (GetResultRequest) returns (GetEventResultResponse) {
+    //option (google.api.http) = {
+    //  get: "/loss/{analysisSid}/result/event"
+    //};
+  }
+
+  rpc CountInteger (CountIntegerRequest) returns (CountIntegerResponse) {
+
+  }
+}
+
+message CountIntegerRequest {
+    int32 count = 1;
+}
+
+message CountIntegerResponse {
+    repeated int32 numbers = 1;
+}
+
+// The request message containing the user's name.
+message GetResultRequest {
+  int32 analysisSid = 1;
+}
+		
+// The response message containing the greetings.
+message GetEventResultResponse {
+  int32 analysisSid = 1;
+  repeated EventResult result = 2;
+}
+
+message EventResult {
+  int32 modelCode = 1;
+  int32 perilSetCode = 2;
+  int32 yearId = 3;
+  int32 eventId = 4;
+  double groundUp = 5;
+  double gross = 6;
+  double retained = 7;
+  double preCatNet = 8;
+}

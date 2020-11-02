@@ -1,0 +1,84 @@
+_format_version: "1.1"
+services:
+- connect_timeout: 60000
+  host: grpcb.in
+  name: grpcbin-service
+  port: 9000
+  protocol: grpc
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: grpcbin-get-route
+    methods:
+    - GET
+    paths:
+    - /v1
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /usr/local/kong/hello.proto
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+- connect_timeout: 60000
+  host: bill-loss
+  name: loss
+  port: 80
+  protocol: grpc
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: get-event-result
+    paths:
+    - /loss.Loss/
+    path_handling: v1
+    preserve_host: false
+    protocols:
+    - grpcs
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+  - name: loss-route
+    paths:
+    - /loss
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - https
+    - http
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /usr/local/kong/lossrest.proto
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+  plugins:
+  - name: grpc-gateway
+    config:
+      proto: /usr/local/kong/lossrest.proto
+    enabled: false
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https

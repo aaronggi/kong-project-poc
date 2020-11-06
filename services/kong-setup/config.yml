@@ -33,7 +33,7 @@ services:
       - http
       - https
 - connect_timeout: 60000
-  host: bill-loss
+  host: loss
   name: loss
   port: 80
   protocol: grpc

@@ -5,7 +5,7 @@ package loss;
 // The greeting service definition.
 service Loss {
   // Sends a greeting
-  rpc GetEventResult (GetResultRequest) returns (GetEventResultReply) {
+  rpc GetEventResult (GetResultRequest) returns (GetEventResultResponse) {
     option (google.api.http) = {
       get: "/loss/{analysisSid}/result/event"
     };
@@ -16,7 +16,15 @@ service Loss {
       get: "/loss/counter/{count}"
     };
   }
+
+  rpc RunLoss (LossRequest) returns (LossResult) {
+    option (google.api.http) = {
+      post: "/loss/run/package/{package}"
+      body: "*"            
+    };
+  }
 }
+
 
 message CountIntegerRequest {
   int32 count = 1;
@@ -30,21 +38,78 @@ message CountIntegerResponse {
 message GetResultRequest {
   int32 analysisSid = 1;
 }
-		
+  
 // The response message containing the greetings.
-message GetEventResultReply {
-  message EventResult {
-    int32 modelCode = 1;
-    int32 perilSetCode = 2;
-    int32 yearId = 3;
-    int32 eventId = 4;
-    double groundUp = 5;
-    double gross = 6;
-    double retained = 7;
-    double preCatnet = 8;
-  }
+message GetEventResultResponse {
   int32 analysisSid = 1;
   repeated EventResult result = 2;
 }
 
+message EventResult {
+  int32 modelCode = 1;
+  int32 perilSetCode = 2;
+  int32 yearId = 3;
+  int32 eventId = 4;
+  double groundUp = 5;
+  double gross = 6;
+  double retained = 7;
+  double preCatNet = 8;
+}
 
+
+message Location {
+
+  enum MatchLevel {
+    USER = 0;
+    OTHER = 1;
+  }
+
+  enum Perils {
+    NONE = 0;
+    PPH = 1;
+    PFL = 2;
+    PWH = 3;
+  }
+
+  message LocationTerms {    
+    repeated Perils perils = 1;
+    int32 limitA = 2;
+  }
+
+  string streetAddr = 1;
+  string city = 2;
+  string subarea = 3;
+  string area = 4; 
+  string postalCode = 5;
+  double lat = 6;
+  double lon = 7;
+  MatchLevel matchLevel = 8;
+  int32 yearBuilt = 9;
+  repeated LocationTerms locationTerms = 10;
+}
+
+
+message LossRequest {
+  repeated Location locations = 1;
+  string package = 2;
+  bool demandSurge = 3;
+  bool stormSurge = 4;
+}
+
+message LossResult {
+  LossRequest request = 1;
+
+  message AnnualSummary {
+    double meanAggregate = 1;
+    double stdDevAggregate = 2;
+  }
+
+  message AnnualDetail {
+    int32 returnPeriod = 1;
+    double aggregateLoss = 2;
+    int32 aggregateYear = 3;
+  }
+
+  repeated AnnualSummary annualSummaries = 2;
+  repeated AnnualDetail annualDetails = 3;
+}

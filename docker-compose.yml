@@ -21,10 +21,10 @@ services:
   #   - 8090:8090
   #   - 8081:8081
 
-  bill-loss:
-    hostname: bill-loss
+  loss:
+    hostname: loss
     build:
-      context: external/kong-poc/GrpcEchoService/GrpcEchoService/
+      context: services/loss-service/GrpcEchoService/
       dockerfile: Dockerfile
     networks:
     - kongnet

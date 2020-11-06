@@ -1,0 +1,223 @@
+<ISOResponses>
+    <ResponseHeader>
+        <AIRTrack>
+            <Instance>637401925267714996;QATS4APP1;8089;2020-11-05T17:02:06.771-0500;Air.VL.ServiceHost.ServiceDriver.exe;AccumResponse;</Instance>
+        </AIRTrack>
+        <runtimeinformation responseid="1560455360;637401925267714996" clientparam="UnknownUserHostAddress">
+            <time start="11/5/2020 5:01:44 PM" end="11/5/2020 5:02:06 PM" timespan="22.465" />
+            <count reportcount="1" errorcount="0" />
+        </runtimeinformation>
+    </ResponseHeader>
+    <Reports>
+        <Report product="LossAnalysis" version="3.5.0.3" timespan="22.465" sequence="2" success="True" ASF.ErrorCode="0" ASF.ErrorMessage="" ASF.InfoMessage="" ASF.PercentCompleted="" ASF.StatusMessage="" ASF.Logfile="">
+            <LossAnalysis engine="7.0.5.5">
+                <Data type="Locations">
+                    <Locations>
+                        <Location>
+                            <ID>28</ID>
+                            <LocationTerms>
+                                <LocationTerm>
+                                    <StrPerils>PFL</StrPerils>
+                                </LocationTerm>
+                            </LocationTerms>
+                            <Address>
+                                <Country>US</Country>
+                                <AreaModeled>CA</AreaModeled>
+                                <PostalCodeModeled>00028</PostalCodeModeled>
+                                <SubareaModeled>Plumas</SubareaModeled>
+                                <GeoPoint>
+                                    <GeoLat>40.111062</GeoLat>
+                                    <GeoLong>-120.418499</GeoLong>
+                                    <MatchLevel>UserSupplied</MatchLevel>
+                                </GeoPoint>
+                            </Address>
+                        </Location>
+                    </Locations>
+                </Data>
+                <ResultSet type="preset" name="10K_US_Flood">
+                    <StrPerils>PFL</StrPerils>
+                    <Options>
+                        <Option name="DemandSurge">False</Option>
+                        <Option name="StormSurge">False</Option>
+                    </Options>
+                    <Results>
+                        <AnnualSummaries>
+                            <AnnualSummary type="Aggregate" perils="PFL" percentPSH="0" percentPPH="0" losstype="GroundUp" coverage="Total">
+                                <Level type="Location" descriptor="ID">28</Level>
+                                <Mean_Agg>2076.5139413813554</Mean_Agg>
+                                <StdDev_Agg>15023.282602279129</StdDev_Agg>
+                            </AnnualSummary>
+                            <AnnualSummary type="Aggregate" perils="PFL" percentPSH="0" percentPPH="0" losstype="Gross" coverage="Total">
+                                <Level type="Location" descriptor="ID">28</Level>
+                                <Mean_Agg>2076.5139413813554</Mean_Agg>
+                                <StdDev_Agg>15023.282602279129</StdDev_Agg>
+                            </AnnualSummary>
+                        </AnnualSummaries>
+                        <AnnualDetails>
+                            <AnnualDetail type="Aggregate" perils="PFL" percentPSH="0" percentPPH="0" losstype="GroundUp" coverage="Total">
+                                <Level type="Location" descriptor="ID">28</Level>
+                                <ResultAnnualDetailRows>
+                                    <ResultRowAnnualDetail>
+                                        <ReturnPeriod>50</ReturnPeriod>
+                                        <Loss_Aggregate>29096.126964766143</Loss_Aggregate>
+                                        <Aggregate_Year>2049</Aggregate_Year>
+                                        <Uncertainty type="Aggregate">
+                                            <Percentile1>
+                                                <Percentile>90</Percentile>
+                                                <Loss>32867.42</Loss>
+                                            </Percentile1>
+                                            <Percentile2>
+                                                <Percentile>95</Percentile>
+                                                <Loss>141418.59</Loss>
+                                            </Percentile2>
+                                        </Uncertainty>
+                                    </ResultRowAnnualDetail>
+                                    <ResultRowAnnualDetail>
+                                        <ReturnPeriod>100</ReturnPeriod>
+                                        <Loss_Aggregate>31385.937420899652</Loss_Aggregate>
+                                        <Aggregate_Year>7150</Aggregate_Year>
+                                        <Uncertainty type="Aggregate">
+                                            <Percentile1>
+                                                <Percentile>90</Percentile>
+                                                <Loss>39941.86</Loss>
+                                            </Percentile1>
+                                            <Percentile2>
+                                                <Percentile>95</Percentile>
+                                                <Loss>158323.45</Loss>
+                                            </Percentile2>
+                                        </Uncertainty>
+                                    </ResultRowAnnualDetail>
+                                    <ResultRowAnnualDetail>
+                                        <ReturnPeriod>250</ReturnPeriod>
+                                        <Loss_Aggregate>33582.604983171979</Loss_Aggregate>
+                                        <Aggregate_Year>5438</Aggregate_Year>
+                                        <Uncertainty type="Aggregate">
+                                            <Percentile1>
+                                                <Percentile>90</Percentile>
+                                                <Loss>47806.62</Loss>
+                                            </Percentile1>
+                                            <Percentile2>
+                                                <Percentile>95</Percentile>
+                                                <Loss>175134.79</Loss>
+                                            </Percentile2>
+                                        </Uncertainty>
+                                    </ResultRowAnnualDetail>
+                                    <ResultRowAnnualDetail>
+                                        <ReturnPeriod>500</ReturnPeriod>
+                                        <Loss_Aggregate>40817.353885907345</Loss_Aggregate>
+                                        <Aggregate_Year>9728</Aggregate_Year>
+                                        <Uncertainty type="Aggregate">
+                                            <Percentile1>
+                                                <Percentile>90</Percentile>
+                                                <Loss>74587.28</Loss>
+                                            </Percentile1>
+                                            <Percentile2>
+                                                <Percentile>95</Percentile>
+                                                <Loss>227276.95</Loss>
+                                            </Percentile2>
+                                        </Uncertainty>
+                                    </ResultRowAnnualDetail>
+                                    <ResultRowAnnualDetail>
+                                        <ReturnPeriod>1000</ReturnPeriod>
+                                        <Loss_Aggregate>60873.596142803071</Loss_Aggregate>
+                                        <Aggregate_Year>8610</Aggregate_Year>
+                                        <Uncertainty type="Aggregate">
+                                            <Percentile1>
+                                                <Percentile>90</Percentile>
+                                                <Loss>150162.06</Loss>
+                                            </Percentile1>
+                                            <Percentile2>
+                                                <Percentile>95</Percentile>
+                                                <Loss>354656.95</Loss>
+                                            </Percentile2>
+                                        </Uncertainty>
+                                    </ResultRowAnnualDetail>
+                                </ResultAnnualDetailRows>
+                            </AnnualDetail>
+                            <AnnualDetail type="Aggregate" perils="PFL" percentPSH="0" percentPPH="0" losstype="Gross" coverage="Total">
+                                <Level type="Location" descriptor="ID">28</Level>
+                                <ResultAnnualDetailRows>
+                                    <ResultRowAnnualDetail>
+                                        <ReturnPeriod>50</ReturnPeriod>
+                                        <Loss_Aggregate>29096.126964766143</Loss_Aggregate>
+                                        <Aggregate_Year>2049</Aggregate_Year>
+                                        <Uncertainty type="Aggregate">
+                                            <Percentile1>
+                                                <Percentile>90</Percentile>
+                                                <Loss>32867.42</Loss>
+                                            </Percentile1>
+                                            <Percentile2>
+                                                <Percentile>95</Percentile>
+                                                <Loss>141418.59</Loss>
+                                            </Percentile2>
+                                        </Uncertainty>
+                                    </ResultRowAnnualDetail>
+                                    <ResultRowAnnualDetail>
+                                        <ReturnPeriod>100</ReturnPeriod>
+                                        <Loss_Aggregate>31385.937420899652</Loss_Aggregate>
+                                        <Aggregate_Year>7150</Aggregate_Year>
+                                        <Uncertainty type="Aggregate">
+                                            <Percentile1>
+                                                <Percentile>90</Percentile>
+                                                <Loss>39941.86</Loss>
+                                            </Percentile1>
+                                            <Percentile2>
+                                                <Percentile>95</Percentile>
+                                                <Loss>158323.45</Loss>
+                                            </Percentile2>
+                                        </Uncertainty>
+                                    </ResultRowAnnualDetail>
+                                    <ResultRowAnnualDetail>
+                                        <ReturnPeriod>250</ReturnPeriod>
+                                        <Loss_Aggregate>33582.604983171979</Loss_Aggregate>
+                                        <Aggregate_Year>5438</Aggregate_Year>
+                                        <Uncertainty type="Aggregate">
+                                            <Percentile1>
+                                                <Percentile>90</Percentile>
+                                                <Loss>47806.62</Loss>
+                                            </Percentile1>
+                                            <Percentile2>
+                                                <Percentile>95</Percentile>
+                                                <Loss>175134.79</Loss>
+                                            </Percentile2>
+                                        </Uncertainty>
+                                    </ResultRowAnnualDetail>
+                                    <ResultRowAnnualDetail>
+                                        <ReturnPeriod>500</ReturnPeriod>
+                                        <Loss_Aggregate>40817.353885907345</Loss_Aggregate>
+                                        <Aggregate_Year>9728</Aggregate_Year>
+                                        <Uncertainty type="Aggregate">
+                                            <Percentile1>
+                                                <Percentile>90</Percentile>
+                                                <Loss>74587.28</Loss>
+                                            </Percentile1>
+                                            <Percentile2>
+                                                <Percentile>95</Percentile>
+                                                <Loss>227276.95</Loss>
+                                            </Percentile2>
+                                        </Uncertainty>
+                                    </ResultRowAnnualDetail>
+                                    <ResultRowAnnualDetail>
+                                        <ReturnPeriod>1000</ReturnPeriod>
+                                        <Loss_Aggregate>60873.596142803071</Loss_Aggregate>
+                                        <Aggregate_Year>8610</Aggregate_Year>
+                                        <Uncertainty type="Aggregate">
+                                            <Percentile1>
+                                                <Percentile>90</Percentile>
+                                                <Loss>150162.06</Loss>
+                                            </Percentile1>
+                                            <Percentile2>
+                                                <Percentile>95</Percentile>
+                                                <Loss>354656.95</Loss>
+                                            </Percentile2>
+                                        </Uncertainty>
+                                    </ResultRowAnnualDetail>
+                                </ResultAnnualDetailRows>
+                            </AnnualDetail>
+                        </AnnualDetails>
+                    </Results>
+                </ResultSet>
+            </LossAnalysis>
+        </Report>
+    </Reports>
+</ISOResponses>

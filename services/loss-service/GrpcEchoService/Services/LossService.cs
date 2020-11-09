@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace GrpcServices.Services
 {
     using LossResultSet = LossResult.Types.ResultSet;
-    using AnnualDetailResultRow = 
+    using AnnualDetailResultRow =
         LossResult
         .Types.ResultSet
         .Types.AnnualDetail
@@ -71,7 +71,6 @@ namespace GrpcServices.Services
 
         public override Task<LossResult> RunLoss(LossRequest lossRequest, ServerCallContext context)
         {
-
             var rand = new Random();
 
             Console.WriteLine($"request = {lossRequest}");
@@ -80,49 +79,10 @@ namespace GrpcServices.Services
                 Package = lossRequest.Package,
                 ResultSet = new LossResultSet()
             };
-            /*{
-                ResultSet = 
-                {
-                    AnnualDetails = 
-                    { 
-                        new LossResultSet.Types.AnnualDetail
-                        {
-                            ResultRows =
-                            {
-                                
-                                new AnnualDetailResultRow
-                                {
-                                    ReturnPeriod = 100,
-                                    AggregateLoss = 10000 * rand.NextDouble(),
-                                    AggregateYear = rand.Next(1, 10000),
-                                    Uncertainty = new Uncertainty
-                                    {
-                                        Type = Uncertainty.Types.Type.Aggregate,
-                                        Percentiles =
-                                        {
-                                            new Uncertainty.Types.Percentile
-                                            {
-                                                Percentile_ = 90,
-                                                Loss = rand.NextDouble() * 2000
-                                            },
-                                            new Uncertainty.Types.Percentile
-                                                {
-                                                Percentile_ = 95,
-                                                Loss = rand.NextDouble() * 2000
-                                            },
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };*/
-
-            response.ResultSet.AnnualDetails.Add(new LossResultSet.Types.AnnualDetail());
 
             try
             {
+                response.ResultSet.AnnualDetails.Add(new LossResultSet.Types.AnnualDetail());
 
                 response.ResultSet.AnnualDetails[0].ResultRows.Add(
                     new AnnualDetailResultRow
@@ -134,7 +94,7 @@ namespace GrpcServices.Services
                         {
                             Type = Uncertainty.Types.Type.Aggregate,
                             Percentiles =
-                            {
+                                {
                             new Uncertainty.Types.Percentile
                             {
                                 Percentile_ = 90,
@@ -145,36 +105,60 @@ namespace GrpcServices.Services
                                 Percentile_ = 95,
                                 Loss = rand.NextDouble() * 2000
                             },
-                            }
+                                }
                         }
                     });
-                response.Locations.AddRange(lossRequest.Locations);
-                for (int i = 0; i < lossRequest.Locations.Count; i++)
+                switch (lossRequest.LocationsOrContractCase)
                 {
-
-                    response.ResultSet.AnnualSummaries.Add(
-                        new LossResultSet.Types.AnnualSummary
+                    case LossRequest.LocationsOrContractOneofCase.Contract:
+                        response.Contract = lossRequest.Contract.Clone();
+                        break;
+                    case LossRequest.LocationsOrContractOneofCase.LocationSet:
+                        try
                         {
-                            Id = lossRequest.Locations[i]?.Id ?? 0,
-                            MeanAggregate = rand.NextDouble() * 1000,
-                            StdDevAggregate = rand.NextDouble() * 100,
-                        });
+                            response.LocationSet = new LocationSet();
+                            response.LocationSet.Locations.AddRange(lossRequest.LocationSet.Locations);
+                            for (int i = 0; i < lossRequest.LocationSet.Locations.Count; i++)
+                            {
 
-                    if (lossRequest.Locations[i]?.LocationTerms[0]?.Perils != null)
-                    {
-                        response.ResultSet.AnnualSummaries[i]?.Perils.AddRange(lossRequest.Locations[i].LocationTerms[0].Perils);
+                                response.ResultSet.AnnualSummaries.Add(
+                                    new LossResultSet.Types.AnnualSummary
+                                    {
+                                        Id = lossRequest.LocationSet.Locations[i]?.Id ?? 0,
+                                        MeanAggregate = rand.NextDouble() * 1000,
+                                        StdDevAggregate = rand.NextDouble() * 100,
+                                    });
 
-                    }
+                                if (lossRequest.LocationSet.Locations[i]?.LocationTerms[0]?.Perils != null)
+                                {
+                                    response.ResultSet.AnnualSummaries[i]?.Perils.AddRange(lossRequest.LocationSet.Locations[i].LocationTerms[0].Perils);
 
+                                }
+
+                            }
+                            response.ResultSet.AnnualDetails[0]?.Perils.AddRange(lossRequest.LocationSet.Locations[0]?.LocationTerms[0]?.Perils);
+                            response.Perils.AddRange(lossRequest.LocationSet.Locations[0]?.LocationTerms[0]?.Perils);
+                        }
+                        catch
+                        {
+                            //whoops
+                        }
+                        break;
+
+                    case LossRequest.LocationsOrContractOneofCase.None:
+                    default:
+                        response.Errors.Add("Location or Contract data was either absent or invalid");
+                        response.ResultSet = null;
+                        break;
                 }
-                response.ResultSet.AnnualDetails[0]?.Perils.AddRange(lossRequest.Locations[0]?.LocationTerms[0]?.Perils);
-                response.Perils.AddRange(lossRequest.Locations[0]?.LocationTerms[0]?.Perils);
+
             }
-            catch
+            catch (Exception e)
             {
-                //whoops
+                response.Errors.Add(e.Message);
+                response.ResultSet = null;
             }
-           
+
             return Task.FromResult(response);
         }
     }

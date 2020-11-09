@@ -56,14 +56,19 @@ message EventResult {
   double preCatNet = 8;
 }
 
+//
+// RunLoss definitions start here
+//
 
 enum Perils {
   NONE = 0;
   PPH = 1;
   PFL = 2;
   PWH = 3;
+  PSH = 4;
 }
 
+// Contains Geo information and terms
 message Location {
 
   enum MatchLevel {
@@ -75,9 +80,13 @@ message Location {
     repeated Perils perils = 1;
     int32 limitA = 2;
     int32 limitB = 3;
-    string deductType =4;
-    int32 deductA = 5;
-    int32 deductB = 6;
+    int32 limitC = 4;
+    int32 limitD = 5;
+    string deductType = 6;
+    int32 deductA = 7;
+    int32 deductB = 8;
+    int32 deductC = 9;
+    int32 deductD = 10;
   }
 
   message Address {
@@ -108,16 +117,36 @@ message Location {
   int32 id = 21;
 }
 
-
-message LossRequest {
-  repeated Location locations = 1;
-  string package = 2;
-  bool demandSurge = 3;
-  bool stormSurge = 4;
+//Requests may contain contract instead of location(s)
+message Contract { 
+  string field1 = 1;
+  string field2 = 2;
+  string field3 = 3;
+  repeated string field4 = 4;
 }
 
+message LocationSet {
+  repeated Location locations = 1;
+}
+//Request type for Running Loss Analysis
+message LossRequest {
+  
+  oneof LocationsOrContract {
+    LocationSet locationSet = 1;
+    Contract contract = 2;
+  }
+  
+  string package = 3;
+  bool demandSurge = 4;
+  bool stormSurge = 5;
+}
+
+//Results from Loss Analysis
 message LossResult {
 
+  // Nested Message Types
+
+  //Contains the results
   message ResultSet{
 
     message AnnualSummary {
@@ -159,9 +188,15 @@ message LossResult {
     repeated AnnualSummary annualSummaries = 1;
     repeated AnnualDetail annualDetails = 2;
   }
+  //end of nested message types
 
-  repeated Location locations = 1;
-  ResultSet resultSet = 2;
-  string package = 3;
-  repeated Perils perils = 4;
+  oneof LocationsOrContract {
+    LocationSet locationSet = 1;
+    Contract contract = 2;
+  }
+  
+  ResultSet resultSet = 3;
+  string package = 4;
+  repeated Perils perils = 5;
+  repeated string errors = 6;
 }

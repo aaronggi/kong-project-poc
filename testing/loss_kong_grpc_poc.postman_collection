@@ -1,0 +1,112 @@
+{
+	"info": {
+		"_postman_id": "d87eb634-a4c9-462a-b802-7923e0dbb61a",
+		"name": "grjpc",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "grpc-test",
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": false,
+				"followRedirects": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"stormSurge\" : \"true\",\r\n    \"demandSurge\" : \"false\",\r\n    \"locationSet\" : {\r\n        \"locations\" : [\r\n            {\r\n                \"id\" : \"10\",\r\n                \"address\" : {\r\n                    \"lat\" : \"11.1\",\r\n                    \"lon\" : \"12.1\"\r\n                },\r\n                \"locationTerms\" : [\r\n                    {\r\n                        \"perils\"  : [\"PPH\", \"PFL\"],\r\n                        \"limitA\"  : 0\r\n                    },\r\n                    {\r\n                        \"perils\" : [\"PFL\"],\r\n                        \"limitA\" : 1000,\r\n                        \"limitB\" : 10000,\r\n                        \"deductType\" : \"NO\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"address\" : {\r\n                    \"area\" : \"USA\",\r\n                    \"postalCode\" : \"02909\"\r\n                },\r\n                \"locationTerms\" : [{\r\n                    \"perils\" : [\"PWH\"]\r\n                }]\r\n            }\r\n        ]\r\n    }\r\n        \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/loss/run/package/10K_Canada",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"loss",
+						"run",
+						"package",
+						"10K_Canada"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "grpc-test contract",
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": false,
+				"followRedirects": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"stormSurge\" : \"true\",\r\n    \"demandSurge\" : \"false\",\r\n    \"contract\" : {\r\n        \"field1\": \"test1\",\r\n        \"field2\": \"test2\",\r\n        \"field3\": \"test3\",\r\n        \"field4\": [\"test4-1\", \"test4-2\", \"test4-3\"]\r\n    }\r\n        \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/loss/run/package/10K_Canada",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"loss",
+						"run",
+						"package",
+						"10K_Canada"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "grpc-test invalid",
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": false,
+				"followRedirects": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"stormSurge\" : \"true\",\r\n    \"demandSurge\" : \"false\",\r\n    \"contract\" : {\r\n        \"field1\": \"test1\",\r\n        \"field2\": \"test2\",\r\n        \"field3\": \"test3\",\r\n        \"field4\": [\"test4-1\", \"test4-2\", \"test4-3\"]\r\n    }\r\n        \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/loss/run/package/10K_Canada",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"loss",
+						"run",
+						"package",
+						"10K_Canada"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

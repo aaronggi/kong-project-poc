@@ -34,6 +34,7 @@ service Loss {
 }
 
 
+
 message CountIntegerRequest {
   int32 count = 1;
 }
@@ -65,6 +66,13 @@ message EventResult {
 }
 
 
+enum Perils {
+  NONE = 0;
+  PPH = 1;
+  PFL = 2;
+  PWH = 3;
+}
+
 message Location {
 
   enum MatchLevel {
@@ -72,28 +80,41 @@ message Location {
     OTHER = 1;
   }
 
-  enum Perils {
-    NONE = 0;
-    PPH = 1;
-    PFL = 2;
-    PWH = 3;
-  }
-
   message LocationTerms {    
     repeated Perils perils = 1;
     int32 limitA = 2;
+    int32 limitB = 3;
+    string deductType =4;
+    int32 deductA = 5;
+    int32 deductB = 6;
   }
 
-  string streetAddr = 1;
-  string city = 2;
-  string subarea = 3;
-  string area = 4; 
-  string postalCode = 5;
-  double lat = 6;
-  double lon = 7;
+  message Address {
+
+    string streetAddr = 1;
+    string city = 2;
+    string subarea = 3;
+    string area = 4; 
+    string postalCode = 5;
+    double lat = 6;
+    double lon = 7;
+  }
+
+  Address address = 1;
   MatchLevel matchLevel = 8;
   int32 yearBuilt = 9;
-  repeated LocationTerms locationTerms = 10;
+  int32 height = 10;
+  int64 rvA = 11;
+  int64 rvB = 12;
+  int64 rvC = 13;
+  int64 rvD = 14;
+  int32 rvDDaysCovered = 15;
+  string constructType = 16;
+  string constructBldg = 17;
+  string occupancyType = 18;
+  string occupancyClass = 19;
+  repeated LocationTerms locationTerms = 20;
+  int32 id = 21;
 }
 
 
@@ -105,19 +126,51 @@ message LossRequest {
 }
 
 message LossResult {
+
+  message ResultSet{
+
+    message AnnualSummary {
+      int32 id = 1;
+      double meanAggregate = 2;
+      double stdDevAggregate = 3;
+      repeated Perils perils = 4;
+    }
   
-  message AnnualSummary {
-    double meanAggregate = 1;
-    double stdDevAggregate = 2;
+    message AnnualDetail {
+  
+      message ResultRow{
+  
+        message Uncertainty {
+          
+          enum Type {
+            AGGREGATE = 0;
+          }
+  
+          message Percentile {
+            int32 percentile = 1;
+            double loss = 2;
+          }
+  
+          Type type = 1;
+          repeated Percentile percentiles = 2;
+  
+        }
+  
+        int32 returnPeriod = 1;
+        double aggregateLoss = 2;
+        int32 aggregateYear = 3;      
+        Uncertainty uncertainty = 4;
+      }
+      repeated Perils perils = 1;
+      repeated ResultRow resultRows = 2;
+    }
+    
+    repeated AnnualSummary annualSummaries = 1;
+    repeated AnnualDetail annualDetails = 2;
   }
 
-  message AnnualDetail {
-    int32 returnPeriod = 1;
-    double aggregateLoss = 2;
-    int32 aggregateYear = 3;
-  }
-
-  LossRequest request = 1;
-  repeated AnnualSummary annualSummaries = 2;
-  repeated AnnualDetail annualDetails = 3;
+  repeated Location locations = 1;
+  ResultSet resultSet = 2;
+  string package = 3;
+  repeated Perils perils = 4;
 }

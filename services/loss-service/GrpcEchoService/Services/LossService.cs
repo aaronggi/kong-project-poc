@@ -9,6 +9,20 @@ using System.Threading.Tasks;
 
 namespace GrpcServices.Services
 {
+    using LossResultSet = LossResult.Types.ResultSet;
+    using AnnualDetailResultRow = 
+        LossResult
+        .Types.ResultSet
+        .Types.AnnualDetail
+        .Types.ResultRow;
+    using Uncertainty =
+        LossResult
+        .Types.ResultSet
+        .Types.AnnualDetail
+        .Types.ResultRow
+        .Types.Uncertainty;
+
+
     public class LossService : Loss.LossBase
     {
         private readonly ILogger<LossService> _logger;
@@ -59,43 +73,108 @@ namespace GrpcServices.Services
         {
 
             var rand = new Random();
-            int i = 1;
-            var geoPt = lossRequest.Locations[0].Lat;
-            //var response = new LossResult { Temp = (int)(geoPt ?? default), Package = lossRequest.Package};
-            var summaries =  new Google.Protobuf.Collections.RepeatedField<LossResult.Types.AnnualSummary>();
-            var response = new LossResult
-            {
-                Request = lossRequest
-            };
 
-            foreach (var loc in lossRequest.Locations)
-            {
-                response.AnnualSummaries.Add(new LossResult.Types.AnnualSummary
-                {
-                    MeanAggregate = (rand.NextDouble() + lossRequest.Locations.Count) * 1000,
-                    StdDevAggregate = rand.NextDouble() * lossRequest.Locations.Count
-
-                });
-            }
-
-            response.AnnualDetails.Add(
-                new LossResult.Types.AnnualDetail
-                {
-                    ReturnPeriod = 50,
-                    AggregateLoss = 10000 * rand.NextDouble() * lossRequest.Locations.Count,
-                    AggregateYear = rand.Next(1, 10000)
-                });
-
-            response.AnnualDetails.Add(
-                new LossResult.Types.AnnualDetail
-                {
-                    ReturnPeriod = 100,
-                    AggregateLoss = 10000 * rand.NextDouble() * lossRequest.Locations.Count,
-                    AggregateYear = rand.Next(1, 10000)
-                });
-
-            Console.WriteLine($"geoPt = {geoPt}, pkg = { lossRequest.Package}");
             Console.WriteLine($"request = {lossRequest}");
+            var response = new LossResult()
+            {
+                Package = lossRequest.Package,
+                ResultSet = new LossResultSet()
+            };
+            /*{
+                ResultSet = 
+                {
+                    AnnualDetails = 
+                    { 
+                        new LossResultSet.Types.AnnualDetail
+                        {
+                            ResultRows =
+                            {
+                                
+                                new AnnualDetailResultRow
+                                {
+                                    ReturnPeriod = 100,
+                                    AggregateLoss = 10000 * rand.NextDouble(),
+                                    AggregateYear = rand.Next(1, 10000),
+                                    Uncertainty = new Uncertainty
+                                    {
+                                        Type = Uncertainty.Types.Type.Aggregate,
+                                        Percentiles =
+                                        {
+                                            new Uncertainty.Types.Percentile
+                                            {
+                                                Percentile_ = 90,
+                                                Loss = rand.NextDouble() * 2000
+                                            },
+                                            new Uncertainty.Types.Percentile
+                                                {
+                                                Percentile_ = 95,
+                                                Loss = rand.NextDouble() * 2000
+                                            },
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };*/
+
+            response.ResultSet.AnnualDetails.Add(new LossResultSet.Types.AnnualDetail());
+
+            try
+            {
+
+                response.ResultSet.AnnualDetails[0].ResultRows.Add(
+                    new AnnualDetailResultRow
+                    {
+                        ReturnPeriod = 50,
+                        AggregateLoss = 10000 * rand.NextDouble(),
+                        AggregateYear = rand.Next(1, 10000),
+                        Uncertainty = new Uncertainty
+                        {
+                            Type = Uncertainty.Types.Type.Aggregate,
+                            Percentiles =
+                            {
+                            new Uncertainty.Types.Percentile
+                            {
+                                Percentile_ = 90,
+                                Loss = rand.NextDouble() * 2000
+                            },
+                            new Uncertainty.Types.Percentile
+                            {
+                                Percentile_ = 95,
+                                Loss = rand.NextDouble() * 2000
+                            },
+                            }
+                        }
+                    });
+                response.Locations.AddRange(lossRequest.Locations);
+                for (int i = 0; i < lossRequest.Locations.Count; i++)
+                {
+
+                    response.ResultSet.AnnualSummaries.Add(
+                        new LossResultSet.Types.AnnualSummary
+                        {
+                            Id = lossRequest.Locations[i]?.Id ?? 0,
+                            MeanAggregate = rand.NextDouble() * 1000,
+                            StdDevAggregate = rand.NextDouble() * 100,
+                        });
+
+                    if (lossRequest.Locations[i]?.LocationTerms[0]?.Perils != null)
+                    {
+                        response.ResultSet.AnnualSummaries[i]?.Perils.AddRange(lossRequest.Locations[i].LocationTerms[0].Perils);
+
+                    }
+
+                }
+                response.ResultSet.AnnualDetails[0]?.Perils.AddRange(lossRequest.Locations[0]?.LocationTerms[0]?.Perils);
+                response.Perils.AddRange(lossRequest.Locations[0]?.LocationTerms[0]?.Perils);
+            }
+            catch
+            {
+                //whoops
+            }
+           
             return Task.FromResult(response);
         }
     }

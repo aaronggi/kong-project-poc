@@ -44,10 +44,10 @@ services:
   - name: get-event-result
     paths:
     - /loss.Loss/
-    path_handling: v1
+    path_handling: v0
     preserve_host: false
     protocols:
-    - grpcs
+    - grpc
     regex_priority: 0
     strip_path: false
     https_redirect_status_code: 426
@@ -60,7 +60,7 @@ services:
     - https
     - http
     regex_priority: 0
-    strip_path: false
+    strip_path: true
     https_redirect_status_code: 426
     plugins:
     - name: grpc-gateway
@@ -72,6 +72,17 @@ services:
       - grpcs
       - http
       - https
+  - name: reflection
+    paths:
+    - /grpc.reflection.v1alpha.ServerReflection
+    path_handling: v1
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
   plugins:
   - name: grpc-gateway
     config:
@@ -82,3 +93,33 @@ services:
     - grpcs
     - http
     - https
+- connect_timeout: 60000
+  host: loss2
+  name: loss2
+  port: 80
+  protocol: grpc
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: loss-nationwide
+    paths:
+    - /nationwide/loss
+    path_handling: v1
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /usr/local/kong/lossrest.proto
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https

@@ -29,7 +29,41 @@ services:
     networks:
     - kongnet
     ports:
-    - 443:443
+    - 10443:443
+    - 10080:80
+    
+  loss2:
+    hostname: loss2
+    build:
+      context: services/loss-service/GrpcEchoService/
+      dockerfile: Dockerfile
+    networks:
+    - kongnet
+    ports:
+    - 10444:443
+    - 10081:80
+    
+  test-common-1:
+    hostname: test-common-1
+    build:
+      context: services/loss-service/GrpcEchoService/
+      dockerfile: Dockerfile.svc1
+    networks:
+    - kongnet
+    ports:
+    - 5005:5005
+
+    
+  test-common-2:
+    hostname: test-common-2
+    build:
+      context: services/loss-service/GrpcEchoService/
+      dockerfile: Dockerfile.svc2
+    networks:
+    - kongnet
+    ports:
+    - 5006:5006
+
         
   #DB for Kong
   kong-database:
@@ -60,9 +94,10 @@ services:
       - 8443:8443
       - 8444:8444    
       - 9000:9000
+      - 9443:9443
     environment:
       #KONG_PREFIX: /usr/local/kong
-      KONG_PROXY_LISTEN: 0.0.0.0:8000 reuseport, 0.0.0.0:8443 reuseport ssl http2 backlog=16384, 0.0.0.0:9443 http2 ssl
+      KONG_PROXY_LISTEN: 0.0.0.0:8000 reuseport, 0.0.0.0:8443 ssl reuseport, 0.0.0.0:9080 http2 reuseport, 0.0.0.0:9443 http2 ssl backlog=16384
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_DECLARATIVE_CONFIG: /etc/kong/config.yml
       KONG_PROXY_ERROR_LOG: /dev/stdout

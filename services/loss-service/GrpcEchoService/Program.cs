@@ -5,6 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using System.Net;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace GrpcServices
 {
@@ -21,6 +24,16 @@ namespace GrpcServices
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.ConfigureKestrel(options =>
+                    {
+#if RELEASELOSS
+                        options.Listen(IPAddress.Any, 80, ListenOptions => ListenOptions.Protocols = HttpProtocols.Http2);
+#elif RELEASE2
+                        options.Listen(IPAddress.Any, 5006, listenOptions => listenOptions.Protocols = HttpProtocols.Http2);
+#else
+                        options.Listen(IPAddress.Any, 5005, listenOptions => listenOptions.Protocols = HttpProtocols.Http2);
+#endif
+                    });
                     webBuilder.UseStartup<Startup>();
                 });
     }

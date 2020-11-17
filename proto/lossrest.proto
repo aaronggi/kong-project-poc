@@ -19,7 +19,7 @@ service Loss {
 
   rpc RunLoss (LossRequest) returns (LossResult) {
     option (google.api.http) = {
-      post: "/loss/run/package/{package}"
+      post: ".*/loss/package/{package}"
       body: "*"            
     };
   }

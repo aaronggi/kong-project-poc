@@ -4,17 +4,22 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>bff63677-5fee-4b66-982e-4b8ae9301685</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <Configurations>Debug;Release;Release2;ReleaseLoss</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
     <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\loss.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\test_common.proto" GrpcServices="Both" />
+    <Protobuf Include="Protos\test_common_svc1.proto" GrpcServices="Server" ProtoRoot="." ProtoCompile="true" />
+    <Protobuf Include="Protos\test_common_svc2.proto" GrpcServices="Server" ProtoRoot="." ProtoCompile="true" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.33.1" />
     <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.33.1" />
     <PackageReference Include="Grpc.Reflection" Version="2.33.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
   </ItemGroup>
 

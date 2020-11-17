@@ -33,8 +33,13 @@ namespace GrpcServices
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<GreeterService>();
+#if RELEASELOSS
                 endpoints.MapGrpcService<LossService>();
+#elif RELEASE2
+                endpoints.MapGrpcService<CommonTest2.Services.Test2Service>();
+#else
+                endpoints.MapGrpcService<CommonTest1.Services.Test1Service>();
+#endif
                 endpoints.MapGrpcReflectionService();
 
                 endpoints.MapGet("/", async context =>

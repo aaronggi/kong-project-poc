@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Configurations>Debug;Release;Release2;ReleaseLoss</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +27,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="3.1.9" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.9" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.9" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +36,15 @@
     </Protobuf>
     <Protobuf Include="..\GrpcEchoService\Protos\loss.proto" GrpcServices="Client">
       <Link>Protos\loss.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\GrpcEchoService\Protos\test_common.proto" GrpcServices="Client" ProtoRoot="..\GrpcEchoService">
+      <Link>Protos\test_common.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\GrpcEchoService\Protos\test_common_svc1.proto" GrpcServices="Client" ProtoRoot="..\GrpcEchoService">
+      <Link>Protos\test_common_svc1.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\GrpcEchoService\Protos\test_common_svc2.proto" GrpcServices="Client" ProtoRoot="..\GrpcEchoService">
+      <Link>Protos\test_common_svc2.proto</Link>
     </Protobuf>
   </ItemGroup>
 

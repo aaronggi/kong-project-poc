@@ -10,10 +10,11 @@ RUN mkdir -p /usr/
 RUN yum -y install nano
 
 #drop back to kong user
-USER kong
 
 ADD ./proto /usr/local/kong/
-
+RUN chown kong /usr/local/share/lua/5.1/protoc.lua
+RUN chmod 777 /usr/local/share/lua/5.1/protoc.lua
+USER kong
 COPY ./external/googleapis/google /usr/local/kong/google
 
 COPY ./external/kong-plugin-grpc-gateway/kong /usr/local/custom/kong

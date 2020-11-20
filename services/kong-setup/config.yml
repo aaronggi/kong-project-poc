@@ -1,5 +1,6 @@
 _format_version: "1.1"
 services:
+#grpcb.in test container  
 - connect_timeout: 60000
   host: grpcb.in
   name: grpcbin-service
@@ -32,6 +33,7 @@ services:
       - grpcs
       - http
       - https
+#Loss Container      
 - connect_timeout: 60000
   host: loss
   name: loss
@@ -43,7 +45,7 @@ services:
   routes:
   - name: get-event-result
     paths:
-    - /loss.Loss/
+    - /loss.Loss
     path_handling: v0
     preserve_host: false
     protocols:
@@ -72,27 +74,101 @@ services:
       - grpcs
       - http
       - https
-  - name: reflection
+  # - name: reflection
+  #   paths:
+  #   - /grpc.reflection.v1alpha.ServerReflection
+  #   path_handling: v0
+  #   preserve_host: false
+  #   protocols:
+  #   - http
+  #   - https
+  #   regex_priority: 0
+  #   strip_path: false
+  #   https_redirect_status_code: 426
+
+#Test-Common-1 container  
+- connect_timeout: 60000
+  host: test-common-1
+  name: test-common-1
+  port: 5005
+  protocol: grpc
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: get-event-result
     paths:
-    - /grpc.reflection.v1alpha.ServerReflection
-    path_handling: v1
+    - /CommonTest1.Test1/
+    path_handling: v0
     preserve_host: false
     protocols:
-    - http
+    - grpc
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+  - name: common-test-1-route
+    paths:
+    - /CommonTest1
+    path_handling: v0
+    preserve_host: false
+    protocols:
     - https
+    - http
     regex_priority: 0
     strip_path: true
     https_redirect_status_code: 426
-  plugins:
-  - name: grpc-gateway
-    config:
-      proto: /usr/local/kong/lossrest.proto
-    enabled: false
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /usr/local/kong/test_common_svc1.proto
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+#Test Common 2 Container
+- connect_timeout: 60000
+  host: test-common-2
+  name: test-common-2
+  port: 5006
+  protocol: grpc
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: get-event-result
+    paths:
+    - /CommonTest2.Test2/
+    path_handling: v0
+    preserve_host: false
     protocols:
     - grpc
-    - grpcs
-    - http
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+  - name: common-test-2-route
+    paths:
+    - /CommonTest2
+    path_handling: v0
+    preserve_host: false
+    protocols:
     - https
+    - http
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    plugins:
+    - name: grpc-gateway
+      config:
+        proto: /usr/local/kong/test_common_svc2.proto
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+#Nationwide Loss Container
 - connect_timeout: 60000
   host: loss2
   name: loss2

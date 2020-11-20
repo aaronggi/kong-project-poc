@@ -30,7 +30,7 @@ namespace GrpcServices
                         options.Listen(IPAddress.Any, 80, ListenOptions => ListenOptions.Protocols = HttpProtocols.Http2);
 #elif RELEASE2
                         options.Listen(IPAddress.Any, 5006, listenOptions => listenOptions.Protocols = HttpProtocols.Http2);
-#else
+#elif RELEASE
                         options.Listen(IPAddress.Any, 5005, listenOptions => listenOptions.Protocols = HttpProtocols.Http2);
 #endif
                     });

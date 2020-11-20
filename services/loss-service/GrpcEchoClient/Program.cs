@@ -94,7 +94,8 @@ namespace GrpcEchoClient
             var httpClient2 = new HttpClient(httpHandler2);
 
 
-            var request = new AIR.CommonReq { Fieldone = "hello", Fieldtwo = 21 };
+            var request = new AIR.CommonReq{ Fieldone = "hello", Fieldtwo = 21 };
+            var request2 = new AIR.CommonReq { Fieldone = "hello", Fieldtwo = 21 };
 
             var endpoint1 = $"http://localhost:{5005}";
             var endpoint2 = $"http://localhost:{5006}";
@@ -111,7 +112,7 @@ namespace GrpcEchoClient
             try
             {
                 var result1 = client1.RunTest1(request);
-                var result2 = client2.RunTest2(request);
+                var result2 = client2.RunTest2(request2);
 
                 if (result1.Equals(result2))
                 {

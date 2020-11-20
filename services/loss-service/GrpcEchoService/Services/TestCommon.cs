@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
+using System.Net.Http;
+using Grpc.Net.Client;
 
 namespace CommonTest1.Services
 {    
@@ -21,7 +23,7 @@ namespace CommonTest1.Services
         public override Task<AIR.CommonRes> RunTest1(AIR.CommonReq req1, ServerCallContext context)
         {
             var response = new AIR.CommonRes(){
-                Resone = req1.Fieldone,
+                Resone = "RUNTEST1" + req1.Fieldone,
                 Restwo = req1.Fieldtwo.ToString()
             };
             return Task.FromResult(response);

@@ -9,10 +9,10 @@
 
   <ItemGroup>
     <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
-    <Protobuf Include="Protos\loss.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\loss.proto" GrpcServices="Both" />
     <Protobuf Include="Protos\test_common.proto" GrpcServices="Both" />
-    <Protobuf Include="Protos\test_common_svc1.proto" GrpcServices="Server" ProtoRoot="." ProtoCompile="true" />
-    <Protobuf Include="Protos\test_common_svc2.proto" GrpcServices="Server" ProtoRoot="." ProtoCompile="true" />
+    <Protobuf Include="Protos\test_common_svc1.proto" GrpcServices="Both" ProtoRoot="." ProtoCompile="true" />
+    <Protobuf Include="Protos\test_common_svc2.proto" GrpcServices="Both" ProtoRoot="." ProtoCompile="true" />
   </ItemGroup>
 
   <ItemGroup>

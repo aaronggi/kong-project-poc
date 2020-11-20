@@ -1,0 +1,12 @@
+syntax = "proto3";
+import "test_common.proto";
+package CommonTest2;
+
+service Test2 {
+ rpc RunTest2 (AIRproto.CommonReq) returns (AIRproto.CommonRes) {
+   option (google.api.http) = {
+     get: "/CommonTest2/{fieldone}"          
+   };
+ }
+}
+

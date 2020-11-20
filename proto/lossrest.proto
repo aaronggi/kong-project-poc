@@ -7,20 +7,20 @@ service Loss {
   // Sends a greeting
   rpc GetEventResult (GetResultRequest) returns (GetEventResultResponse) {
     option (google.api.http) = {
-      get: "/loss/{analysisSid}/result/event"
+      get: "/runloss/{analysisSid}/result/event"
     };
   }
 
   rpc CountInteger (CountIntegerRequest) returns (CountIntegerResponse) {
-    option (google.api.http) = {
-      get: "/loss/counter/{count}"
+    option (googlerun.api.http) = {
+      get: "/runloss/counter/{count}"
     };
   }
 
   rpc RunLoss (LossRequest) returns (LossResult) {
     option (google.api.http) = {
-      get: "/loss/package/{package}" //just testing something
-      post: ".*/loss/package/{package}"
+      get: "/runloss/package/{package}" //just testing something
+      post: ".*/runloss/package/{package}"
       body: "*"            
     };
   }

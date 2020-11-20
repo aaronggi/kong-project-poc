@@ -55,7 +55,7 @@ services:
     https_redirect_status_code: 426
   - name: loss-route
     paths:
-    - /loss
+    - /runloss
     path_handling: v0
     preserve_host: false
     protocols:
@@ -96,7 +96,7 @@ services:
   retries: 5
   write_timeout: 60000
   routes:
-  - name: get-event-result
+  - name: commonTest1_grpc
     paths:
     - /CommonTest1.Test1/
     path_handling: v0
@@ -137,7 +137,7 @@ services:
   retries: 5
   write_timeout: 60000
   routes:
-  - name: get-event-result
+  - name: commonTest2_grpc
     paths:
     - /CommonTest2.Test2/
     path_handling: v0

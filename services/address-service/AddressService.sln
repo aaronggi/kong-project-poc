@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AddressService", "AddressGrpcService\AddressService.csproj", "{D38EC498-32C4-4AEE-80A2-5D30E5BC8095}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Release2|Any CPU = Release2|Any CPU
+		ReleaseLoss|Any CPU = ReleaseLoss|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D38EC498-32C4-4AEE-80A2-5D30E5BC8095}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D38EC498-32C4-4AEE-80A2-5D30E5BC8095}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D38EC498-32C4-4AEE-80A2-5D30E5BC8095}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D38EC498-32C4-4AEE-80A2-5D30E5BC8095}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D38EC498-32C4-4AEE-80A2-5D30E5BC8095}.Release2|Any CPU.ActiveCfg = Release|Any CPU
+		{D38EC498-32C4-4AEE-80A2-5D30E5BC8095}.Release2|Any CPU.Build.0 = Release|Any CPU
+		{D38EC498-32C4-4AEE-80A2-5D30E5BC8095}.ReleaseLoss|Any CPU.ActiveCfg = Release|Any CPU
+		{D38EC498-32C4-4AEE-80A2-5D30E5BC8095}.ReleaseLoss|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D743F8D3-81B8-4B0E-A7FB-C971A6457005}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,16 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "AIR";
+
+package AIRproto;
+
+// Contains Geo information and terms
+message CommonReq {
+  string fieldone = 1;
+  int32 fieldtwo = 2;
+}
+
+message CommonRes {
+  string resone = 1;
+  string restwo = 2;
+}

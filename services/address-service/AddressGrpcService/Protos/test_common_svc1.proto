@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "Protos/test_common.proto";
+
+option csharp_namespace = "CommonTest1";
+
+package CommonTest1;
+
+service Test1 {
+  rpc RunTest1 (AIRproto.CommonReq) returns (AIRproto.CommonRes) {
+
+  }
+}

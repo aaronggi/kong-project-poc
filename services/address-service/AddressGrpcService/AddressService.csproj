@@ -4,16 +4,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>bff63677-5fee-4b66-982e-4b8ae9301685</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <Configurations>Debug;Release;Release2;ReleaseLoss</Configurations>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
     <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
-    <Protobuf Include="Protos\address_service.proto" GrpcServices="Both" />
     <Protobuf Include="Protos\loss.proto" GrpcServices="Both" />
     <Protobuf Include="Protos\test_common.proto" GrpcServices="Both" />
     <Protobuf Include="Protos\test_common_svc1.proto" GrpcServices="Both" ProtoRoot="." ProtoCompile="true" />
     <Protobuf Include="Protos\test_common_svc2.proto" GrpcServices="Both" ProtoRoot="." ProtoCompile="true" />
+    <Protobuf Include="Protos\address_service.proto" GrpcServices="Both" ProtoRoot="." ProtoCompile="true" />
   </ItemGroup>
 
   <ItemGroup>

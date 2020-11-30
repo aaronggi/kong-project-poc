@@ -1,0 +1,775 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Conditions": {
+    "CreateCluster": {
+      "Fn::Equals": [
+        "",
+        {
+          "Ref": "ParameterClusterName"
+        }
+      ]
+    },
+    "CreateLoadBalancer": {
+      "Fn::Equals": [
+        "",
+        {
+          "Ref": "ParameterLoadBalancerARN"
+        }
+      ]
+    }
+  },
+  "Description": "CloudFormation template created by Docker for deploying applications on Amazon ECS",
+  "Parameters": {
+    "ParameterClusterName": {
+      "Description": "Name of the ECS cluster to deploy to (optional)",
+      "Type": "String"
+    },
+    "ParameterLoadBalancerARN": {
+      "Description": "Name of the LoadBalancer to connect to (optional)",
+      "Type": "String"
+    },
+    "ParameterSubnet1Id": {
+      "Description": "SubnetId, for Availability Zone 1 in the region in your VPC",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "ParameterSubnet2Id": {
+      "Description": "SubnetId, for Availability Zone 2 in the region in your VPC",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "ParameterVPCId": {
+      "Description": "ID of the VPC",
+      "Type": "AWS::EC2::VPC::Id"
+    }
+  },
+  "Resources": {
+    "CloudMap": {
+      "Properties": {
+        "Description": "Service Map for Docker Compose project grpcpoc",
+        "Name": "grpcpoc.local",
+        "Vpc": {
+          "Ref": "ParameterVPCId"
+        }
+      },
+      "Type": "AWS::ServiceDiscovery::PrivateDnsNamespace"
+    },
+    "Cluster": {
+      "Condition": "CreateCluster",
+      "Properties": {
+        "ClusterName": "grpcpoc",
+        "Tags": [
+          {
+            "Key": "com.docker.compose.project",
+            "Value": "grpcpoc"
+          }
+        ]
+      },
+      "Type": "AWS::ECS::Cluster"
+    },
+    "grpcpocLoadBalancer": {
+      "Condition": "CreateLoadBalancer",
+      "Properties": {
+        "Name": "grpcpocLoadBalancer",
+        "Scheme": "internet-facing",
+        "Subnets": [
+          {
+            "Ref": "ParameterSubnet1Id"
+          },
+          {
+            "Ref": "ParameterSubnet2Id"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "com.docker.compose.project",
+            "Value": "grpcpoc"
+          }
+        ],
+        "Type": "network"
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    },
+    "GrpcpocKongnetNetwork": {
+      "Properties": {
+        "GroupDescription": "grpcpoc kongnet Security Group",
+        "GroupName": "GrpcpocKongnetNetwork",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "loss:443/tcp",
+            "FromPort": 443,
+            "IpProtocol": "TCP",
+            "ToPort": 443
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "loss:80/tcp",
+            "FromPort": 80,
+            "IpProtocol": "TCP",
+            "ToPort": 80
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "kong:8000/tcp",
+            "FromPort": 8000,
+            "IpProtocol": "TCP",
+            "ToPort": 8000
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "kong:9080/tcp",
+            "FromPort": 9080,
+            "IpProtocol": "TCP",
+            "ToPort": 9080
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "com.docker.compose.project",
+            "Value": "grpcpoc"
+          },
+          {
+            "Key": "com.docker.compose.network",
+            "Value": "kongnet"
+          }
+        ],
+        "VpcId": {
+          "Ref": "ParameterVPCId"
+        }
+      },
+      "Type": "AWS::EC2::SecurityGroup"
+    },
+    "GrpcpocKongnetNetworkIngress": {
+      "Properties": {
+        "Description": "Allow communication within network kongnet",
+        "GroupId": {
+          "Ref": "GrpcpocKongnetNetwork"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "GrpcpocKongnetNetwork"
+        }
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress"
+    },
+    "KongService": {
+      "DependsOn": [
+        "KongTCP8000Listener",
+        "KongTCP9080Listener"
+      ],
+      "Properties": {
+        "Cluster": {
+          "Fn::If": [
+            "CreateCluster",
+            {
+              "Ref": "Cluster"
+            },
+            {
+              "Ref": "ParameterClusterName"
+            }
+          ]
+        },
+        "DeploymentConfiguration": {
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 100
+        },
+        "DeploymentController": {
+          "Type": "ECS"
+        },
+        "DesiredCount": 1,
+        "LaunchType": "FARGATE",
+        "LoadBalancers": [
+          {
+            "ContainerName": "kong",
+            "ContainerPort": 8000,
+            "TargetGroupArn": {
+              "Ref": "KongTCP8000TargetGroup"
+            }
+          },
+          {
+            "ContainerName": "kong",
+            "ContainerPort": 9080,
+            "TargetGroupArn": {
+              "Ref": "KongTCP9080TargetGroup"
+            }
+          }
+        ],
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "AssignPublicIp": "ENABLED",
+            "SecurityGroups": [
+              {
+                "Ref": "GrpcpocKongnetNetwork"
+              }
+            ],
+            "Subnets": [
+              {
+                "Ref": "ParameterSubnet1Id"
+              },
+              {
+                "Ref": "ParameterSubnet2Id"
+              }
+            ]
+          }
+        },
+        "PropagateTags": "SERVICE",
+        "SchedulingStrategy": "REPLICA",
+        "ServiceRegistries": [
+          {
+            "RegistryArn": {
+              "Fn::GetAtt": [
+                "KongServiceDiscoveryEntry",
+                "Arn"
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "com.docker.compose.project",
+            "Value": "grpcpoc"
+          },
+          {
+            "Key": "com.docker.compose.service",
+            "Value": "kong"
+          }
+        ],
+        "TaskDefinition": {
+          "Ref": "KongTaskDefinition"
+        }
+      },
+      "Type": "AWS::ECS::Service"
+    },
+    "KongServiceDiscoveryEntry": {
+      "Properties": {
+        "Description": "\"kong\" service discovery entry in Cloud Map",
+        "DnsConfig": {
+          "DnsRecords": [
+            {
+              "TTL": 60,
+              "Type": "A"
+            }
+          ],
+          "RoutingPolicy": "MULTIVALUE"
+        },
+        "HealthCheckCustomConfig": {
+          "FailureThreshold": 1
+        },
+        "Name": "kong",
+        "NamespaceId": {
+          "Ref": "CloudMap"
+        }
+      },
+      "Type": "AWS::ServiceDiscovery::Service"
+    },
+    "KongTCP8000Listener": {
+      "Properties": {
+        "DefaultActions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "KongTCP8000TargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "LoadBalancerArn": {
+          "Fn::If": [
+            "CreateLoadBalancer",
+            {
+              "Ref": "grpcpocLoadBalancer"
+            },
+            {
+              "Ref": "ParameterLoadBalancerARN"
+            }
+          ]
+        },
+        "Port": 8000,
+        "Protocol": "TCP"
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener"
+    },
+    "KongTCP8000TargetGroup": {
+      "Properties": {
+        "Port": 8000,
+        "Protocol": "TCP",
+        "Tags": [
+          {
+            "Key": "com.docker.compose.project",
+            "Value": "grpcpoc"
+          }
+        ],
+        "TargetType": "ip",
+        "VpcId": {
+          "Ref": "ParameterVPCId"
+        }
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup"
+    },
+    "KongTCP9080Listener": {
+      "Properties": {
+        "DefaultActions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "KongTCP9080TargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "LoadBalancerArn": {
+          "Fn::If": [
+            "CreateLoadBalancer",
+            {
+              "Ref": "grpcpocLoadBalancer"
+            },
+            {
+              "Ref": "ParameterLoadBalancerARN"
+            }
+          ]
+        },
+        "Port": 9080,
+        "Protocol": "TCP"
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener"
+    },
+    "KongTCP9080TargetGroup": {
+      "Properties": {
+        "Port": 9080,
+        "Protocol": "TCP",
+        "Tags": [
+          {
+            "Key": "com.docker.compose.project",
+            "Value": "grpcpoc"
+          }
+        ],
+        "TargetType": "ip",
+        "VpcId": {
+          "Ref": "ParameterVPCId"
+        }
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup"
+    },
+    "KongTaskDefinition": {
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Environment": [
+              {
+                "Name": "KONG_DECLARATIVE_CONFIG",
+                "Value": "/usr/local/kong/config.yml"
+              },
+              {
+                "Name": "KONG_DATABASE",
+                "Value": "off"
+              },
+              {
+                "Name": "LOCALDOMAIN",
+                "Value": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ".compute.internal",
+                      " grpcpoc.local"
+                    ]
+                  ]
+                }
+              },
+              {
+                "Name": "KONG_PG_USER",
+                "Value": "kong"
+              },
+              {
+                "Name": "KONG_PG_PASSWORD",
+                "Value": "kong"
+              },
+              {
+                "Name": "KONG_CASSANDRA_CONTACT_POINTS",
+                "Value": "kong-database"
+              },
+              {
+                "Name": "KONG_LOG_LEVEL",
+                "Value": "debug"
+              },
+              {
+                "Name": "KONG_PROXY_LISTEN",
+                "Value": "0.0.0.0:8000 reuseport, 0.0.0.0:8443 ssl reuseport, 0.0.0.0:9080 http2 reuseport, 0.0.0.0:9443 http2 ssl backlog=16384"
+              }
+            ],
+            "Essential": true,
+            "Image": "agilbert93/kong-air-poc",
+            "LinuxParameters": {},
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "LogGroup"
+                },
+                "awslogs-region": "us-east-2",
+                "awslogs-stream-prefix": "grpcpoc"
+              }
+            },
+            "Name": "kong",
+            "PortMappings": [
+              {
+                "ContainerPort": 8000,
+                "HostPort": 8000,
+                "Protocol": "tcp"
+              },
+              {
+                "ContainerPort": 9080,
+                "HostPort": 9080,
+                "Protocol": "tcp"
+              }
+            ]
+          }
+        ],
+        "Cpu": "256",
+        "ExecutionRoleArn": {
+          "Ref": "KongTaskExecutionRole"
+        },
+        "Family": "grpcpoc-kong",
+        "Memory": "512",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": [
+          "FARGATE"
+        ]
+      },
+      "Type": "AWS::ECS::TaskDefinition"
+    },
+    "KongTaskExecutionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+          "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "LogGroup": {
+      "Properties": {
+        "LogGroupName": "/docker-compose/grpcpoc"
+      },
+      "Type": "AWS::Logs::LogGroup"
+    },
+    "LossService": {
+      "DependsOn": [
+        "LossTCP443Listener",
+        "LossTCP80Listener"
+      ],
+      "Properties": {
+        "Cluster": {
+          "Fn::If": [
+            "CreateCluster",
+            {
+              "Ref": "Cluster"
+            },
+            {
+              "Ref": "ParameterClusterName"
+            }
+          ]
+        },
+        "DeploymentConfiguration": {
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 100
+        },
+        "DeploymentController": {
+          "Type": "ECS"
+        },
+        "DesiredCount": 1,
+        "LaunchType": "FARGATE",
+        "LoadBalancers": [
+          {
+            "ContainerName": "loss",
+            "ContainerPort": 443,
+            "TargetGroupArn": {
+              "Ref": "LossTCP443TargetGroup"
+            }
+          },
+          {
+            "ContainerName": "loss",
+            "ContainerPort": 80,
+            "TargetGroupArn": {
+              "Ref": "LossTCP80TargetGroup"
+            }
+          }
+        ],
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "AssignPublicIp": "ENABLED",
+            "SecurityGroups": [
+              {
+                "Ref": "GrpcpocKongnetNetwork"
+              }
+            ],
+            "Subnets": [
+              {
+                "Ref": "ParameterSubnet1Id"
+              },
+              {
+                "Ref": "ParameterSubnet2Id"
+              }
+            ]
+          }
+        },
+        "PropagateTags": "SERVICE",
+        "SchedulingStrategy": "REPLICA",
+        "ServiceRegistries": [
+          {
+            "RegistryArn": {
+              "Fn::GetAtt": [
+                "LossServiceDiscoveryEntry",
+                "Arn"
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "com.docker.compose.project",
+            "Value": "grpcpoc"
+          },
+          {
+            "Key": "com.docker.compose.service",
+            "Value": "loss"
+          }
+        ],
+        "TaskDefinition": {
+          "Ref": "LossTaskDefinition"
+        }
+      },
+      "Type": "AWS::ECS::Service"
+    },
+    "LossServiceDiscoveryEntry": {
+      "Properties": {
+        "Description": "\"loss\" service discovery entry in Cloud Map",
+        "DnsConfig": {
+          "DnsRecords": [
+            {
+              "TTL": 60,
+              "Type": "A"
+            }
+          ],
+          "RoutingPolicy": "MULTIVALUE"
+        },
+        "HealthCheckCustomConfig": {
+          "FailureThreshold": 1
+        },
+        "Name": "loss",
+        "NamespaceId": {
+          "Ref": "CloudMap"
+        }
+      },
+      "Type": "AWS::ServiceDiscovery::Service"
+    },
+    "LossTCP443Listener": {
+      "Properties": {
+        "DefaultActions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "LossTCP443TargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "LoadBalancerArn": {
+          "Fn::If": [
+            "CreateLoadBalancer",
+            {
+              "Ref": "grpcpocLoadBalancer"
+            },
+            {
+              "Ref": "ParameterLoadBalancerARN"
+            }
+          ]
+        },
+        "Port": 443,
+        "Protocol": "TCP"
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener"
+    },
+    "LossTCP443TargetGroup": {
+      "Properties": {
+        "Port": 443,
+        "Protocol": "TCP",
+        "Tags": [
+          {
+            "Key": "com.docker.compose.project",
+            "Value": "grpcpoc"
+          }
+        ],
+        "TargetType": "ip",
+        "VpcId": {
+          "Ref": "ParameterVPCId"
+        }
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup"
+    },
+    "LossTCP80Listener": {
+      "Properties": {
+        "DefaultActions": [
+          {
+            "ForwardConfig": {
+              "TargetGroups": [
+                {
+                  "TargetGroupArn": {
+                    "Ref": "LossTCP80TargetGroup"
+                  }
+                }
+              ]
+            },
+            "Type": "forward"
+          }
+        ],
+        "LoadBalancerArn": {
+          "Fn::If": [
+            "CreateLoadBalancer",
+            {
+              "Ref": "grpcpocLoadBalancer"
+            },
+            {
+              "Ref": "ParameterLoadBalancerARN"
+            }
+          ]
+        },
+        "Port": 80,
+        "Protocol": "TCP"
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener"
+    },
+    "LossTCP80TargetGroup": {
+      "Properties": {
+        "Port": 80,
+        "Protocol": "TCP",
+        "Tags": [
+          {
+            "Key": "com.docker.compose.project",
+            "Value": "grpcpoc"
+          }
+        ],
+        "TargetType": "ip",
+        "VpcId": {
+          "Ref": "ParameterVPCId"
+        }
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup"
+    },
+    "LossTaskDefinition": {
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Environment": [
+              {
+                "Name": "LOCALDOMAIN",
+                "Value": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ".compute.internal",
+                      " grpcpoc.local"
+                    ]
+                  ]
+                }
+              }
+            ],
+            "Essential": true,
+            "Image": "agilbert93/air-loss-poc",
+            "LinuxParameters": {},
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "LogGroup"
+                },
+                "awslogs-region": "us-east-2",
+                "awslogs-stream-prefix": "grpcpoc"
+              }
+            },
+            "Name": "loss",
+            "PortMappings": [
+              {
+                "ContainerPort": 443,
+                "HostPort": 443,
+                "Protocol": "tcp"
+              },
+              {
+                "ContainerPort": 80,
+                "HostPort": 80,
+                "Protocol": "tcp"
+              }
+            ]
+          }
+        ],
+        "Cpu": "256",
+        "ExecutionRoleArn": {
+          "Ref": "LossTaskExecutionRole"
+        },
+        "Family": "grpcpoc-loss",
+        "Memory": "512",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": [
+          "FARGATE"
+        ]
+      },
+      "Type": "AWS::ECS::TaskDefinition"
+    },
+    "LossTaskExecutionRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+          "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    }
+  }
+}

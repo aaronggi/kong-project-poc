@@ -1,0 +1,210 @@
+﻿syntax = "proto3";
+
+//import "google/api/annotations.proto";
+
+option csharp_namespace = "GrpcServices";
+
+package loss;
+
+// The greeting service definition.
+service Loss {
+  // Sends a greeting
+  rpc GetEventResult (GetResultRequest) returns (GetEventResultResponse) {
+    //option (google.api.http) = {
+    //  get: "/loss/{analysisSid}/result/event"
+    //};
+  }
+
+  rpc CountInteger (CountIntegerRequest) returns (CountIntegerResponse) {
+
+  }
+
+  rpc RunLoss (LossRequest) returns (LossResult) {
+    // option (google.api.http) = {
+    //   get: "/loss/run/pkg/{package}"
+    //   additional_bindings {
+    //     get: "/loss/run/pkg/{package}/lat/{location.geoPoint.lat}/lon/{location.geoPoint.lon},
+    //   }
+    //   additional_bindings {
+    //     post: "/loss/run"
+    //     body: "*"
+    //   }
+    // };
+    }
+}
+
+
+message CountIntegerRequest {
+  int32 count = 1;
+}
+
+message CountIntegerResponse {
+  repeated int32 numbers = 1;
+}
+
+// The request message containing the user's name.
+message GetResultRequest {
+  int32 analysisSid = 1;
+}
+  
+// The response message containing the greetings.
+message GetEventResultResponse {
+  int32 analysisSid = 1;
+  repeated EventResult result = 2;
+}
+
+message EventResult {
+  int32 modelCode = 1;
+  int32 perilSetCode = 2;
+  int32 yearId = 3;
+  int32 eventId = 4;
+  double groundUp = 5;
+  double gross = 6;
+  double retained = 7;
+  double preCatNet = 8;
+}
+
+//
+// RunLoss definitions start here
+//
+
+enum Perils {
+  NONE = 0;
+  PPH = 1;
+  PFL = 2;
+  PWH = 3;
+  PSH = 4;
+}
+
+// Contains Geo information and terms
+message Location {
+
+  enum MatchLevel {
+    USER = 0;
+    OTHER = 1;
+  }
+
+  message LocationTerms {    
+    repeated Perils perils = 1;
+    int32 limitA = 2;
+    int32 limitB = 3;
+    int32 limitC = 4;
+    int32 limitD = 5;
+    string deductType = 6;
+    int32 deductA = 7;
+    int32 deductB = 8;
+    int32 deductC = 9;
+    int32 deductD = 10;
+  }
+
+  message Address {
+
+    string streetAddr = 1;
+    string city = 2;
+    string subarea = 3;
+    string area = 4; 
+    string postalCode = 5;
+    double lat = 6;
+    double lon = 7;
+  }
+
+  Address address = 1;
+  MatchLevel matchLevel = 8;
+  int32 yearBuilt = 9;
+  int32 height = 10;
+  int64 rvA = 11;
+  int64 rvB = 12;
+  int64 rvC = 13;
+  int64 rvD = 14;
+  int32 rvDDaysCovered = 15;
+  string constructType = 16;
+  string constructBldg = 17;
+  string occupancyType = 18;
+  string occupancyClass = 19;
+  repeated LocationTerms locationTerms = 20;
+  int32 id = 21;
+}
+
+//Requests may contain contract instead of location(s)
+message Contract { 
+  string field1 = 1;
+  string field2 = 2;
+  string field3 = 3;
+  repeated string field4 = 4;
+}
+
+message LocationSet { 
+ repeated Location locations = 1;
+}
+//Request type for Running Loss Analysis
+message LossRequest {
+  
+  oneof LocationsOrContract {
+    LocationSet locationSet = 1;
+    Contract contract = 2;
+  }
+  
+  string package = 3;
+  bool demandSurge = 4;
+  bool stormSurge = 5;
+}
+
+//Results from Loss Analysis
+message LossResult {
+  
+  // Nested Message Types
+
+  //Contains the results
+  message ResultSet{
+
+    message AnnualSummary {
+      int32 id = 1;
+      double meanAggregate = 2;
+      double stdDevAggregate = 3;
+      repeated Perils perils = 4;
+    }
+  
+    message AnnualDetail {
+  
+      message ResultRow{
+  
+        message Uncertainty {
+          
+          enum Type {
+            AGGREGATE = 0;
+          }
+  
+          message Percentile {
+            int32 percentile = 1;
+            double loss = 2;
+          }
+  
+          Type type = 1;
+          repeated Percentile percentiles = 2;
+  
+        }
+  
+        int32 returnPeriod = 1;
+        double aggregateLoss = 2;
+        int32 aggregateYear = 3;      
+        Uncertainty uncertainty = 4;
+      }
+      repeated Perils perils = 1;
+      repeated ResultRow resultRows = 2;
+    }
+    
+    repeated AnnualSummary annualSummaries = 1;
+    repeated AnnualDetail annualDetails = 2;
+  }
+  //end of nested message types
+
+  oneof LocationsOrContract {
+    LocationSet locationSet = 1;
+    Contract contract = 2;
+  }
+
+  ResultSet resultSet = 3;
+  string package = 4;
+  repeated Perils perils = 5;
+  repeated string errors = 6;
+}

@@ -1,0 +1,24 @@
+syntax = "proto3";
+package address;
+
+option csharp_namespace = "GrpcServices";
+
+
+service Address {
+  rpc GetAddress (AIRAddress) returns (GeoPoint) {    
+      // option (google.api.http) = {
+      //   get: "/AddressService/{country}/{state}/{city}"          
+      // };
+    }
+}
+
+message AIRAddress {
+  string country = 1;
+  string state = 2;
+  string city = 3;
+}
+
+message GeoPoint {
+  double lat = 1;
+  double lon = 2;
+}

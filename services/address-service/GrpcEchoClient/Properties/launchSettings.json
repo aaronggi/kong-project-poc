@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GrpcEchoClient": {
+      "commandName": "Project",
+      "commandLineArgs": "r 8443"
+    }
+  }
+}

@@ -1,9 +1,12 @@
 ﻿using Grpc.Core;
+using Grpc.Net.Client;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -71,7 +74,26 @@ namespace GrpcServices.Services
 
         public override Task<LossResult> RunLoss(LossRequest lossRequest, ServerCallContext context)
         {
+            // Enable support for unencrypted HTTP2  
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             var rand = new Random();
+
+            var sw = Stopwatch.StartNew();
+            var httpHandler = new HttpClientHandler();
+            
+            var httpClient = new HttpClient(httpHandler);
+            
+            httpHandler.ServerCertificateCustomValidationCallback =
+                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+            
+
+            var chan = GrpcChannel.ForAddress("http://address:7777", new GrpcChannelOptions { HttpClient = httpClient, Credentials = ChannelCredentials.Insecure });
+            var addrClient = new Address.AddressClient(chan);
+
+            var responseAddr = addrClient.GetAddress(new AIRAddress { City = "city" });
+            sw.Stop();
+            Console.WriteLine($"Total time: through kong: {sw.ElapsedMilliseconds}");
+
 
             Console.WriteLine($"request = {lossRequest}");
             var response = new LossResult()

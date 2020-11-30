@@ -32,6 +32,17 @@ services:
     - 10443:443
     - 10080:80
     
+    
+  address:
+    hostname: address
+    build:
+      context: services/address-service/AddressGrpcService/
+      dockerfile: Dockerfile
+    networks:
+    - kongnet
+    ports:
+    - 7777:7777
+    
   loss2:
     hostname: loss2
     build:
@@ -99,9 +110,9 @@ services:
       #KONG_PREFIX: /usr/local/kong
       KONG_PROXY_LISTEN: 0.0.0.0:8000 reuseport, 0.0.0.0:8443 ssl reuseport, 0.0.0.0:9080 http2 reuseport, 0.0.0.0:9443 http2 ssl backlog=16384
       KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_DECLARATIVE_CONFIG: /etc/kong/config.yml
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/config.yml
       KONG_PROXY_ERROR_LOG: /dev/stdout
-      KONG_DATABASE: 'postgres'
+      KONG_DATABASE: 'off'
       KONG_PG_HOST: kong-database
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
@@ -115,32 +126,32 @@ services:
     - kong-database:kong-database
     depends_on:
     - kong-database
-    - kong-setup
+    # - kong-setup
 
   #Kong Gateway
-  kong-setup:
-    build: 
-      context: .
-      dockerfile: services/kong-setup/Dockerfile
-    networks: 
-    - kongnet
-    restart: on-failure  
-    environment:
-      KONG_PROXY_LISTEN: 0.0.0.0:8000 reuseport, 0.0.0.0:8443 backlog=16384 reuseport ssl http2, 0.0.0.0:9443 http2 ssl
-      KONG_DECLARATIVE_CONFIG: /etc/kong/config.yml
-      KONG_DATABASE: 'postgres'
-      KONG_PG_HOST: kong-database
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
-      KONG_CASSANDRA_CONTACT_POINTS: kong-database
-      KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
-      KONG_LUA_PACKAGE_PATH: /usr/local/custom/?.lua;;
-      KONG_PLUGINS: grpc-gateway
-      KONG_LOG_LEVEL: debug
-    links:
-    - kong-database:kong-database
-    depends_on:
-    - kong-database
+  # kong-setup:
+  #   build: 
+  #     context: .
+  #     dockerfile: services/kong-setup/Dockerfile
+  #   networks: 
+  #   - kongnet
+  #   restart: on-failure  
+  #   environment:
+  #     KONG_PROXY_LISTEN: 0.0.0.0:8000 reuseport, 0.0.0.0:8443 backlog=16384 reuseport ssl http2, 0.0.0.0:9443 http2 ssl
+  #     KONG_DECLARATIVE_CONFIG: /etc/kong/config.yml
+  #     KONG_DATABASE: 'postgres'
+  #     KONG_PG_HOST: kong-database
+  #     KONG_PG_USER: kong
+  #     KONG_PG_PASSWORD: kong
+  #     KONG_CASSANDRA_CONTACT_POINTS: kong-database
+  #     KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+  #     KONG_LUA_PACKAGE_PATH: /usr/local/custom/?.lua;;
+  #     KONG_PLUGINS: grpc-gateway
+  #     KONG_LOG_LEVEL: debug
+  #   links:
+  #   - kong-database:kong-database
+  #   depends_on:
+  #   - kong-database
 
 # Dashboard
   konga:
@@ -158,7 +169,7 @@ services:
       NO_AUTH: "true"
     depends_on:
     - kong-database
-    - kong-setup
+    # - kong-setup
     links:
     - kong:kong
     - kong-database:kong-databse

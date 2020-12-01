@@ -19,7 +19,10 @@ services:
       options:
         awslogs-region: us-east-2
     healthcheck:
-      test: ["CMD", "echo 1"]
+      test: ["CMD-SHELL", "echo", "1"]
+      timeout: 45s
+      interval: 30s
+      retries: 10
     
       
   address:
@@ -34,7 +37,11 @@ services:
       options:
         awslogs-region: us-east-2
     healthcheck:
-      test: ["CMD", "echo 1"]
+      test: ["CMD-SHELL", "echo", "1"]
+      timeout: 45s
+      interval: 30s
+      retries: 10
+      
         
   # #DB for Kong
   # kong-database:
@@ -85,7 +92,11 @@ services:
       #KONG_PLUGINS: grpc-gateway
       KONG_LOG_LEVEL: debug
     healthcheck:
-      test: ["CMD", "echo 1"]
+      test: ["CMD-SHELL", "echo", "1"]
+      timeout: 45s
+      interval: 30s
+      retries: 10
+      
     #links:
     #- kong-database:kong-database
     #depends_on:
